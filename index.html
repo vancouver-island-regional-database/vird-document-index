@@ -376,8 +376,9 @@
         const resultsContainer = document.getElementById('results');
         const statusContainer = document.getElementById('status-msg');
         
-        resultsContainer.innerHTML = '<div class="system-void-state">[i] V-V-V-VIRD, VIRD, VIRD. V-VIRD is the word...</div>';
-        statusContainer.innerHTML = "Querying live database files...";
+// Wrapped in backticks to safely contain any special characters or single quotes
+        resultsContainer.innerHTML = `<div class="system-void-state">[i] Querying live database files...</div>`;
+        statusContainer.innerHTML = "V-V-V-VIRD, VIRD, VIRD. V-VIRD is the word...";
         
         let combinedEntries = [];
         let sourcesLoaded = 0;
