@@ -281,6 +281,30 @@
             letter-spacing: 0.25px;
         }
 
+        .doc-summary { 
+            color: var(--text-muted); 
+            font-size: 13px; 
+            margin: 4px 0; 
+            border-left: 2px solid var(--border-glow); 
+            padding-left: 10px; 
+        }
+
+        .tag-container { 
+            display: flex; 
+            gap: 6px; 
+            margin-top: 4px; 
+            flex-wrap: wrap;
+        }
+
+        .data-badge { 
+            background: rgba(56, 189, 248, 0.05); 
+            color: var(--neon-blue); 
+            padding: 1px 6px; 
+            font-size: 11px; 
+            border-radius: 3px; 
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+
         /* Empty state baseline */
         .system-void-state {
             padding: 48px;
@@ -320,6 +344,9 @@
                 <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
                 <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
                 <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
+                <label><input type="checkbox" id="chk-cvrd" checked> CVRD (Cowichan Valley)</label>
+                <label><input type="checkbox" id="chk-rdn"> RDN (Nanaimo Region)</label>
+                <label><input type="checkbox" id="chk-northcow"> North Cowichan</label>
             </div>
         </div>
     </aside>
@@ -327,7 +354,7 @@
     <!-- Results Stream Area -->
     <section class="stream-viewport">
         <div class="metrics-strip">
-            <div id="status-msg"></div>
+            <div id="status-msg">Database initialized. Enter terms to search records.</div>
             <div style="font-size: 10px; font-weight: 700; color: var(--gov-gold); letter-spacing: 0.5px;">Search Results</div>
         </div>
 
@@ -353,7 +380,7 @@
         const statusContainer = document.getElementById('status-msg');
         
         resultsContainer.innerHTML = '<div class="system-void-state">[i] Locating data mappings...</div>';
-        statusContainer.innerHTML = "";
+        statusContainer.innerHTML = "Querying live database files...";
         
         let combinedEntries = [];
         let sourcesLoaded = 0;
@@ -376,6 +403,7 @@
 
         if (combinedEntries.length === 0) {
             resultsContainer.innerHTML = '<div class="system-void-state" style="color:#F43F5E; border-color:#F43F5E;">[-] Critical Error: Zero source records pulled.</div>';
+            statusContainer.innerHTML = "Query aborted.";
             return;
         }
 
@@ -383,12 +411,15 @@
         if (query !== "") {
             const searchTerms = query.split(/\s+/);
             matches = combinedEntries.filter(entry => {
+                // Safeguard against missing/undefined fields during string composition
                 const searchString = [
-                    entry.doc_title,
-                    entry.source_url,
-                    entry.doc_summary,
-                    entry.doc_description,
-                    entry.tag1, entry.tag2, entry.tag3
+                    entry.doc_title || "",
+                    entry.source_url || "",
+                    entry.doc_summary || "",
+                    entry.doc_description || "",
+                    entry.tag1 || "", 
+                    entry.tag2 || "", 
+                    entry.tag3 || ""
                 ].join(" ").toLowerCase();
                 
                 return searchTerms.every(term => searchString.includes(term));
@@ -409,6 +440,14 @@
             const docTitle = item.doc_title || "Untitled Document Entry";
             const jurisdiction = item.jurisdiction || "Not Listed";
             const date = item.doc_date || "Undated";
+            const summary = item.doc_summary || "";
+
+            let tagsHtml = "";
+            ['tag1', 'tag2', 'tag3', 'tag4'].forEach(tagKey => {
+                if (item[tagKey]) {
+                    tagsHtml += `<span class="data-badge">${item[tagKey]}</span> `;
+                }
+            });
 
             const div = document.createElement('div');
             div.className = 'raw-record-card';
@@ -423,6 +462,8 @@
                 <div>
                     <span class="jurisdiction-label">${jurisdiction}</span>
                 </div>
+                ${summary ? `<div class="doc-summary">${summary}</div>` : ''}
+                ${tagsHtml ? `<div class="tag-container">${tagsHtml}</div>` : ''}
             `;
             resultsContainer.appendChild(div);
         });
