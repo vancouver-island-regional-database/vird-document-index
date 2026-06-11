@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRD / REGIONAL DOCUMENT MIRROR SEARCH</title>
+    <style>
+        /* Terminal Monochrome Palette */
+        body { 
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; 
+            padding: 30px; 
+            background-color: #0f1115; 
+            color: #c9d1d9; 
+            line-height: 1.5;
+        }
+        h2 { color: #58a6ff; font-size: 20px; margin-bottom: 2px; letter-spacing: -0.5px; }
+        .subtitle { color: #8b949e; font-size: 13px; margin-bottom: 25px; text-transform: uppercase; }
+        
+        .control-panel { 
+            background: #161b22; 
+            padding: 20px; 
+            border: 1px solid #30363d; 
+            border-radius: 6px;
+            margin-bottom: 25px; 
+        }
+        .section-title { color: #f0f6fc; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .source-selection { margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .source-selection label { color: #c9d1d9; font-size: 13px; cursor: pointer; display: flex; align-items: center; }
+        .source-selection input { margin-right: 8px; accent-color: #58a6ff; }
+        
+        .search-container { display: flex; gap: 10px; }
+        .search-box { 
+            flex-grow: 1; 
+            background: #0f1115; 
+            border: 1px solid #30363d; 
+            padding: 10px; 
+            color: #f0f6fc; 
+            font-family: inherit; 
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .search-box:focus { border-color: #58a6ff; outline: none; }
+        
+        .btn-search { 
+            background: #21262d; 
+            border: 1px solid #30363d; 
+            color: #c9d1d9; 
+            padding: 10px 24px; 
+            font-family: inherit; 
+            cursor: pointer; 
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .btn-search:hover { background: #30363d; border-color: #8b949e; color: #f0f6fc; }
+        
+        .meta-info { margin-top: 8px; color: #8b949e; font-size: 12px; }
+        
+        #results { margin-top: 25px; }
+        .result-item { 
+            background: #161b22; 
+            padding: 15px; 
+            border: 1px solid #30363d; 
+            border-radius: 6px;
+            margin-bottom: 12px; 
+        }
+        .result-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+        .result-item a { color: #58a6ff; text-decoration: none; font-weight: bold; font-size: 15px; }
+        .result-item a:hover { text-decoration: underline; color: #79c0ff; }
+        
+        /* Badges matching your ledger schema columns */
+        .source-tag { background: #238636; color: #fff; padding: 2px 6px; font-size: 11px; border-radius: 3px; font-weight: bold; margin-right: 8px; }
+        .jurisdiction-tag { background: #21262d; color: #8b949e; border: 1px solid #30363d; padding: 1px 6px; font-size: 11px; border-radius: 3px; }
+        .date-tag { color: #8b949e; font-size: 12px; }
+        
+        .doc-summary { color: #8b949e; font-size: 13px; margin: 8px 0; border-left: 2px solid #30363d; padding-left: 10px; }
+        .tag-container { display: flex; gap: 6px; margin-top: 8px; }
+        .data-badge { background: #21262d; color: #58a6ff; padding: 1px 6px; font-size: 11px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <h2>VIRD DOCUMENT INDEX</h2>
+    <div class="subtitle">Interjurisdictional Directory of online public Documents</div>
+
+    <div class="control-panel">
+        <div class="section-title">Filter by jurisdictional source</div>
+        <div class="source-selection">
+            <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
+            <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
+            <label><input type="checkbox" id="chk-cvrd" checked> CVRD (Cowichan Valley)</label>
+            <label><input type="checkbox" id="chk-rdn"> RDN (Nanaimo Region)</label>
+            <label><input type="checkbox" id="chk-northcow"> North Cowichan</label>
+        </div>
+
+        <div class="section-title">Search Terms</div>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-box" placeholder="Enter Keywords... (e.g., water restrictions)">
+            <button onclick="executeSearch()" class="btn-search">Search Files</button>
+        </div>
+        <div id="status-msg" class="meta-info"></div>
+    </div>
+
+    <div class="section-title">Search Results</div>
+    <div id="results">No active query execution in sequence.</div>
+
+    <script>
+        const dataSources = {
+            'chk-ladysmith': { name: 'Ladysmith', url: 'data/ladysmith.json' },
+            'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' },
+            'chk-cvrd': { name: 'CVRD', url: 'data/cvrd.json' },
+            'chk-rdn': { name: 'RDN', url: 'data/rdn.json' },
+            'chk-northcow': { name: 'North Cowichan', url: 'data/northcowichan.json' }
+        };
+
+        async function executeSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('results');
+            const statusContainer = document.getElementById('status-msg');
+            
+            resultsContainer.innerHTML = "[i] Locating data mappings...";
+            statusContainer.innerHTML = "";
+
+            let combinedEntries = [];
+            let sourcesLoaded = 0;
+
+            for (const [id, source] of Object.entries(dataSources)) {
+                if (document.getElementById(id).checked) {
+                    try {
+                        const response = await fetch(source.url);
+                        if (response.ok) {
+                            const data = await response.json();
+                            data.forEach(item => item.sourceName = source.name);
+                            combinedEntries = combinedEntries.concat(data);
+                            sourcesLoaded++;
+                        }
+                    } catch (err) {
+                        console.warn(`Registry offline: ${source.name}`);
+                    }
+                }
+            }
+
+            if (combinedEntries.length === 0) {
+                resultsContainer.innerHTML = "[-] Critical Error: Zero source records pulled.";
+                return;
+            }
+
+            let matches = combinedEntries;
+            if (query !== "") {
+                const searchTerms = query.split(/\s+/);
+                matches = combinedEntries.filter(entry => {
+                    // Match across all major columns from your tracking structure
+                    const searchString = [
+                        entry.doc_title,
+                        entry.source_url,
+                        entry.doc_summary,
+                        entry.doc_description,
+                        entry.tag1, entry.tag2, entry.tag3
+                    ].join(" ").toLowerCase();
+                    
+                    return searchTerms.every(term => searchString.includes(term));
+                });
+            }
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = "[-] Status: 0 records found matching constraints.";
+                statusContainer.innerHTML = `Scanned ${combinedEntries.length} entries across ${sourcesLoaded} nodes.`;
+                return;
+            }
+
+            statusContainer.innerHTML = `Success: Found ${matches.length} matches out of ${combinedEntries.length} total entries.`;
+            resultsContainer.innerHTML = "";
+
+            matches.forEach(item => {
+                const docUrl = item.source_url || "#";
+                const docTitle = item.doc_title || "Untitled Document Entry";
+                const jurisdiction = item.jurisdiction || "Not Listed";
+                const date = item.doc_date || "Undated";
+                const summary = item.doc_summary || "";
+                
+                // Collect existing optional tags dynamically
+                let tagsHtml = "";
+                ['tag1', 'tag2', 'tag3', 'tag4'].forEach(tagKey => {
+                    if (item[tagKey]) {
+                        tagsHtml += `<span class="data-badge">${item[tagKey]}</span> `;
+                    }
+                });
+
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div class="result-header">
+                        <div>
+                            <span class="source-tag">${item.sourceName}</span>
+                            <a href="${docUrl}" target="_blank">${docTitle}</a>
+                        </div>
+                        <div class="date-tag">[${date}]</div>
+                    </div>
+                    <div class="meta-info">
+                        <span class="jurisdiction-tag">${jurisdiction}</span>
+                    </div>
+                    ${summary ? `<div class="doc-summary">${summary}</div>` : ''}
+                    ${tagsHtml ? `<div class="tag-container">${tagsHtml}</div>` : ''}
+                `;
+                resultsContainer.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
