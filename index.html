@@ -1,210 +1,432 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRD / REGIONAL DOCUMENT MIRROR SEARCH</title>
+    <title>VIRD DOCUMENT INDEX</title>
     <style>
-        /* Terminal Monochrome Palette */
+        :root {
+            --bg-main: #0B0F19;         /* Premium Midnight Deep Blue */
+            --bg-surface: #131A2C;      /* Card/Panel Blue-Grey */
+            --bg-input: #1B243C;        /* High-contrast Field Fill */
+            --gov-blue: #003366;
+            --gov-gold: #FCBA19;        /* Institutional Gold Accent */
+            --neon-blue: #38BDF8;       /* High-visibility active link */
+            --text-bright: #F8FAFC;     /* Primary Text */
+            --text-muted: #94A3B8;      /* Secondary Labels */
+            --border-glow: #243152;     /* Sharp Container Lines */
+        }
+
         body { 
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; 
-            padding: 30px; 
-            background-color: #0f1115; 
-            color: #c9d1d9; 
-            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0; 
+            padding: 0;
+            background-color: var(--bg-main); 
+            color: var(--text-bright); 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        h2 { color: #58a6ff; font-size: 20px; margin-bottom: 2px; letter-spacing: -0.5px; }
-        .subtitle { color: #8b949e; font-size: 13px; margin-bottom: 25px; text-transform: uppercase; }
-        
-        .control-panel { 
-            background: #161b22; 
-            padding: 20px; 
-            border: 1px solid #30363d; 
-            border-radius: 6px;
-            margin-bottom: 25px; 
+
+        /* Agency-Styled Minimalist Header */
+        header { 
+            background-color: #060911; 
+            padding: 16px 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            border-bottom: 1px solid var(--border-glow);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 10;
+            flex-shrink: 0;
         }
-        .section-title { color: #f0f6fc; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
         
-        .source-selection { margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-        .source-selection label { color: #c9d1d9; font-size: 13px; cursor: pointer; display: flex; align-items: center; }
-        .source-selection input { margin-right: 8px; accent-color: #58a6ff; }
-        
-        .search-container { display: flex; gap: 10px; }
-        .search-box { 
-            flex-grow: 1; 
-            background: #0f1115; 
-            border: 1px solid #30363d; 
-            padding: 10px; 
-            color: #f0f6fc; 
-            font-family: inherit; 
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-bright);
+        }
+
+        .engine-status-badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--neon-blue);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+        }
+
+        .nav-hub-link {
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-size: 12px; 
+            font-weight: 600; 
+            padding: 6px 14px; 
+            border-radius: 4px;
+            border: 1px solid var(--border-glow); 
+            transition: all 0.15s ease;
+        }
+        .nav-hub-link:hover { 
+            color: var(--text-bright);
+            background: var(--bg-surface);
+            border-color: var(--neon-blue);
+        }
+
+        /* Workspace Grid Split */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Refined Control Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #080D18;
+            border-right: 1px solid var(--border-glow);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-title {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 14px 0;
+        }
+
+        .search-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-input);
+            border: 1px solid var(--border-glow);
+            padding: 14px;
+            color: var(--text-bright);
             font-size: 14px;
-            border-radius: 4px;
-        }
-        .search-box:focus { border-color: #58a6ff; outline: none; }
-        
-        .btn-search { 
-            background: #21262d; 
-            border: 1px solid #30363d; 
-            color: #c9d1d9; 
-            padding: 10px 24px; 
-            font-family: inherit; 
-            cursor: pointer; 
-            font-weight: bold;
-            border-radius: 4px;
-        }
-        .btn-search:hover { background: #30363d; border-color: #8b949e; color: #f0f6fc; }
-        
-        .meta-info { margin-top: 8px; color: #8b949e; font-size: 12px; }
-        
-        #results { margin-top: 25px; }
-        .result-item { 
-            background: #161b22; 
-            padding: 15px; 
-            border: 1px solid #30363d; 
             border-radius: 6px;
-            margin-bottom: 12px; 
+            transition: all 0.2s ease;
         }
-        .result-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
-        .result-item a { color: #58a6ff; text-decoration: none; font-weight: bold; font-size: 15px; }
-        .result-item a:hover { text-decoration: underline; color: #79c0ff; }
-        
-        /* Badges matching your ledger schema columns */
-        .source-tag { background: #238636; color: #fff; padding: 2px 6px; font-size: 11px; border-radius: 3px; font-weight: bold; margin-right: 8px; }
-        .jurisdiction-tag { background: #21262d; color: #8b949e; border: 1px solid #30363d; padding: 1px 6px; font-size: 11px; border-radius: 3px; }
-        .date-tag { color: #8b949e; font-size: 12px; }
-        
-        .doc-summary { color: #8b949e; font-size: 13px; margin: 8px 0; border-left: 2px solid #30363d; padding-left: 10px; }
-        .tag-container { display: flex; gap: 6px; margin-top: 8px; }
-        .data-badge { background: #21262d; color: #58a6ff; padding: 1px 6px; font-size: 11px; border-radius: 3px; }
+        .search-box:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+            outline: none;
+        }
+
+        .btn-submit {
+            background: var(--gov-blue);
+            color: #FFFFFF;
+            border: none;
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #001A33;
+            transition: background 0.15s;
+        }
+        .btn-submit:hover { 
+            background: #004488; 
+        }
+
+        /* Checkbox Layout Group */
+        .checkbox-container {
+            background: var(--bg-surface);
+            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid var(--border-glow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-container label {
+            font-size: 13.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            user-select: none;
+            color: var(--text-bright);
+        }
+
+        .checkbox-container input {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--neon-blue);
+        }
+
+        /* Main Data Display Stream */
+        .stream-viewport {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Status Metrics Strip */
+        .metrics-strip {
+            background: #090E1A;
+            border-bottom: 1px solid var(--border-glow);
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Infinite Scroll Pane for Global Document Ingestion */
+        .scrollpane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* High-Density Modern Raw Record Row */
+        .raw-record-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow);
+            border-radius: 6px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .raw-record-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            background: #17223B;
+        }
+
+        .record-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .record-identity {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .node-badge {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-bright);
+            border: 1px solid var(--border-glow);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .raw-record-card a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14.5px;
+            line-height: 1.4;
+        }
+        .raw-record-card a:hover {
+            color: #7DD3FC;
+            text-decoration: underline;
+        }
+
+        .date-stamp {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        .jurisdiction-label {
+            color: var(--gov-gold);
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.25px;
+        }
+
+        /* Empty state baseline */
+        .system-void-state {
+            padding: 48px;
+            text-align: center;
+            color: var(--text-muted);
+            background: #080D18;
+            border: 1px dashed var(--border-glow);
+            border-radius: 6px;
+            font-size: 13.5px;
+        }
     </style>
 </head>
 <body>
 
-    <h2>VIRD DOCUMENT INDEX</h2>
-    <div class="subtitle">Interjurisdictional Directory of online public Documents</div>
-
-    <div class="control-panel">
-        <div class="section-title">Filter by jurisdictional source</div>
-        <div class="source-selection">
-            <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
-            <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
-            <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
-            <label><input type="checkbox" id="chk-cvrd" checked> CVRD (Cowichan Valley)</label>
-            <label><input type="checkbox" id="chk-rdn"> RDN (Nanaimo Region)</label>
-            <label><input type="checkbox" id="chk-northcow"> North Cowichan</label>
-        </div>
-
-        <div class="section-title">Search Terms</div>
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-box" placeholder="Enter Keywords... (e.g., water restrictions)">
-            <button onclick="executeSearch()" class="btn-search">Search Files</button>
-        </div>
-        <div id="status-msg" class="meta-info"></div>
+<header>
+    <div class="brand-wrapper">
+        <div class="brand-title">VIRD DOCUMENT INDEX</div>
+        <div class="engine-status-badge">Interjurisdictional Directory of online public Documents</div>
     </div>
+    <div>
+        <a href="/home/" class="nav-hub-link">RETURN TO HUB</a>
+    </div>
+</header>
 
-    <div class="section-title">Search Results</div>
-    <div id="results">No active query execution in sequence.</div>
+<div class="workspace">
+    <!-- Filters and Term Parsing inputs -->
+    <aside class="sidebar">
+        <div class="search-block">
+            <h3 class="sidebar-section-title">Search Terms</h3>
+            <input type="text" id="search-input" class="search-box" placeholder="Enter keywords... (e.g., water restrictions)">
+            <button onclick="executeSearch()" class="btn-submit">Search Files</button>
+        </div>
 
-    <script>
-        const dataSources = {
-            'chk-ladysmith': { name: 'Ladysmith', url: 'data/ladysmith.json' },
-            'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' },
-            'chk-sd68': { name: 'SD68', url: 'data/sd68.json' },
-            'chk-cvrd': { name: 'CVRD', url: 'data/cvrd.json' },
-            'chk-rdn': { name: 'RDN', url: 'data/rdn.json' },
-            'chk-northcow': { name: 'North Cowichan', url: 'data/northcowichan.json' }
-        };
+        <div>
+            <h3 class="sidebar-section-title">Filter by jurisdictional source</h3>
+            <div class="checkbox-container">
+                <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
+                <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
+                <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
+            </div>
+        </div>
+    </aside>
 
-        async function executeSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const resultsContainer = document.getElementById('results');
-            const statusContainer = document.getElementById('status-msg');
-            
-            resultsContainer.innerHTML = "[i] Locating data mappings...";
-            statusContainer.innerHTML = "";
+    <!-- Results Stream Area -->
+    <section class="stream-viewport">
+        <div class="metrics-strip">
+            <div id="status-msg"></div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--gov-gold); letter-spacing: 0.5px;">Search Results</div>
+        </div>
 
-            let combinedEntries = [];
-            let sourcesLoaded = 0;
+        <div class="scrollpane" id="results">
+            <div class="system-void-state">No active query execution in sequence.</div>
+        </div>
+    </section>
+</div>
 
-            for (const [id, source] of Object.entries(dataSources)) {
-                if (document.getElementById(id).checked) {
-                    try {
-                        const response = await fetch(source.url);
-                        if (response.ok) {
-                            const data = await response.json();
-                            data.forEach(item => item.sourceName = source.name);
-                            combinedEntries = combinedEntries.concat(data);
-                            sourcesLoaded++;
-                        }
-                    } catch (err) {
-                        console.warn(`Registry offline: ${source.name}`);
+<script>
+    const dataSources = {
+        'chk-ladysmith': { name: 'Ladysmith', url: 'data/ladysmith.json' },
+        'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' },
+        'chk-sd68': { name: 'SD68', url: 'data/sd68.json' },
+        'chk-cvrd': { name: 'CVRD', url: 'data/cvrd.json' },
+        'chk-rdn': { name: 'RDN', url: 'data/rdn.json' },
+        'chk-northcow': { name: 'North Cowichan', url: 'data/northcowichan.json' }
+    };
+
+    async function executeSearch() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        const resultsContainer = document.getElementById('results');
+        const statusContainer = document.getElementById('status-msg');
+        
+        resultsContainer.innerHTML = '<div class="system-void-state">[i] Locating data mappings...</div>';
+        statusContainer.innerHTML = "";
+        
+        let combinedEntries = [];
+        let sourcesLoaded = 0;
+
+        for (const [id, source] of Object.entries(dataSources)) {
+            if (document.getElementById(id).checked) {
+                try {
+                    const response = await fetch(source.url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        data.forEach(item => item.sourceName = source.name);
+                        combinedEntries = combinedEntries.concat(data);
+                        sourcesLoaded++;
                     }
+                } catch (err) {
+                    console.warn(`Registry offline: ${source.name}`);
                 }
             }
+        }
 
-            if (combinedEntries.length === 0) {
-                resultsContainer.innerHTML = "[-] Critical Error: Zero source records pulled.";
-                return;
-            }
+        if (combinedEntries.length === 0) {
+            resultsContainer.innerHTML = '<div class="system-void-state" style="color:#F43F5E; border-color:#F43F5E;">[-] Critical Error: Zero source records pulled.</div>';
+            return;
+        }
 
-            let matches = combinedEntries;
-            if (query !== "") {
-                const searchTerms = query.split(/\s+/);
-                matches = combinedEntries.filter(entry => {
-                    const searchString = [
-                        entry.doc_title,
-                        entry.source_url,
-                        entry.doc_summary,
-                        entry.doc_description,
-                        entry.tag1, entry.tag2, entry.tag3
-                    ].join(" ").toLowerCase();
-                    
-                    return searchTerms.every(term => searchString.includes(term));
-                });
-            }
-
-            if (matches.length === 0) {
-                resultsContainer.innerHTML = "[-] Status: 0 records found matching constraints.";
-                statusContainer.innerHTML = `Scanned ${combinedEntries.length} entries across ${sourcesLoaded} nodes.`;
-                return;
-            }
-
-            statusContainer.innerHTML = `Success: Found ${matches.length} matches out of ${combinedEntries.length} total entries.`;
-            resultsContainer.innerHTML = "";
-
-            matches.forEach(item => {
-                const docUrl = item.source_url || "#";
-                const docTitle = item.doc_title || "Untitled Document Entry";
-                const jurisdiction = item.jurisdiction || "Not Listed";
-                const date = item.doc_date || "Undated";
-                const summary = item.doc_summary || "";
+        let matches = combinedEntries;
+        if (query !== "") {
+            const searchTerms = query.split(/\s+/);
+            matches = combinedEntries.filter(entry => {
+                const searchString = [
+                    entry.doc_title,
+                    entry.source_url,
+                    entry.doc_summary,
+                    entry.doc_description,
+                    entry.tag1, entry.tag2, entry.tag3
+                ].join(" ").toLowerCase();
                 
-                let tagsHtml = "";
-                ['tag1', 'tag2', 'tag3', 'tag4'].forEach(tagKey => {
-                    if (item[tagKey]) {
-                        tagsHtml += `<span class="data-badge">${item[tagKey]}</span> `;
-                    }
-                });
-
-                const div = document.createElement('div');
-                div.className = 'result-item';
-                div.innerHTML = `
-                    <div class="result-header">
-                        <div>
-                            <span class="source-tag">${item.sourceName}</span>
-                            <a href="${docUrl}" target="_blank">${docTitle}</a>
-                        </div>
-                        <div class="date-tag">[${date}]</div>
-                    </div>
-                    <div class="meta-info">
-                        <span class="jurisdiction-tag">${jurisdiction}</span>
-                    </div>
-                    ${summary ? `<div class="doc-summary">${summary}</div>` : ''}
-                    ${tagsHtml ? `<div class="tag-container">${tagsHtml}</div>` : ''}
-                `;
-                resultsContainer.appendChild(div);
+                return searchTerms.every(term => searchString.includes(term));
             });
         }
-    </script>
+
+        if (matches.length === 0) {
+            resultsContainer.innerHTML = '<div class="system-void-state">[-] Status: 0 records found matching constraints.</div>';
+            statusContainer.innerHTML = `Scanned ${combinedEntries.length} entries across ${sourcesLoaded} nodes.`;
+            return;
+        }
+
+        statusContainer.innerHTML = `Success: Found ${matches.length} matches out of ${combinedEntries.length} total entries.`;
+        resultsContainer.innerHTML = "";
+
+        matches.forEach(item => {
+            const docUrl = item.source_url || "#";
+            const docTitle = item.doc_title || "Untitled Document Entry";
+            const jurisdiction = item.jurisdiction || "Not Listed";
+            const date = item.doc_date || "Undated";
+
+            const div = document.createElement('div');
+            div.className = 'raw-record-card';
+            div.innerHTML = `
+                <div class="record-top">
+                    <div class="record-identity">
+                        <span class="node-badge">${item.sourceName}</span>
+                        <a href="${docUrl}" target="_blank">${docTitle}</a>
+                    </div>
+                    <div class="date-stamp">[${date}]</div>
+                </div>
+                <div>
+                    <span class="jurisdiction-label">${jurisdiction}</span>
+                </div>
+            `;
+            resultsContainer.appendChild(div);
+        });
+    }
+</script>
 </body>
 </html>
