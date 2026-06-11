@@ -88,6 +88,7 @@
         <div class="source-selection">
             <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
             <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
+            <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
             <label><input type="checkbox" id="chk-cvrd" checked> CVRD (Cowichan Valley)</label>
             <label><input type="checkbox" id="chk-rdn"> RDN (Nanaimo Region)</label>
             <label><input type="checkbox" id="chk-northcow"> North Cowichan</label>
@@ -108,6 +109,7 @@
         const dataSources = {
             'chk-ladysmith': { name: 'Ladysmith', url: 'data/ladysmith.json' },
             'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' },
+            'chk-sd68': { name: 'SD68', url: 'data/sd68.json' },
             'chk-cvrd': { name: 'CVRD', url: 'data/cvrd.json' },
             'chk-rdn': { name: 'RDN', url: 'data/rdn.json' },
             'chk-northcow': { name: 'North Cowichan', url: 'data/northcowichan.json' }
@@ -149,7 +151,6 @@
             if (query !== "") {
                 const searchTerms = query.split(/\s+/);
                 matches = combinedEntries.filter(entry => {
-                    // Match across all major columns from your tracking structure
                     const searchString = [
                         entry.doc_title,
                         entry.source_url,
@@ -178,7 +179,6 @@
                 const date = item.doc_date || "Undated";
                 const summary = item.doc_summary || "";
                 
-                // Collect existing optional tags dynamically
                 let tagsHtml = "";
                 ['tag1', 'tag2', 'tag3', 'tag4'].forEach(tagKey => {
                     if (item[tagKey]) {
