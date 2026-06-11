@@ -325,7 +325,7 @@
         <div class="engine-status-badge">Interjurisdictional Directory of online public Documents</div>
     </div>
     <div>
-        <a href="/home/" class="nav-hub-link">RETURN TO VIRD HOME</a>
+        <a href="/home/" class="nav-hub-link">HOME</a>
     </div>
 </header>
 
@@ -343,7 +343,7 @@
             <div class="checkbox-container">
                 <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
                 <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
-                <label><input type="checkbox" id="chk-stzuminus"> Stz'uminus Nation</label>
+                <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
             </div>
         </div>
     </aside>
@@ -364,11 +364,8 @@
 <script>
     const dataSources = {
         'chk-ladysmith': { name: 'Ladysmith', url: 'data/ladysmith.json' },
-        'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' },
-        'chk-sd68': { name: 'SD68', url: 'data/sd68.json' },
-        'chk-cvrd': { name: 'CVRD', url: 'data/cvrd.json' },
-        'chk-rdn': { name: 'RDN', url: 'data/rdn.json' },
-        'chk-northcow': { name: 'North Cowichan', url: 'data/northcowichan.json' }
+        'chk-sd68': { name: 'SD68', url: 'data/sd68.json' }
+        'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/stzuminus.json' }
     };
 
     async function executeSearch() {
