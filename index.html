@@ -329,50 +329,46 @@
     </div>
 </header>
 
-<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center; background-color: #F8FAFC;">
+<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center; background-color: #FAFAFA;">
     
     <div style="width: 100%; max-width: 900px;">
         <style>
-            /* Light Theme & Brand Color Overrides */
+            /* Native Brand Injection from VIRD Master Styles */
             :root {
-                --pagefind-ui-primary: #003366; /* gov-blue */
-                --pagefind-ui-text: #0B0F19;    
+                --pagefind-ui-primary: #003366; 
+                --pagefind-ui-text: #313132;    
                 --pagefind-ui-background: #FFFFFF;
-                --pagefind-ui-border: #CBD5E1;
-                --pagefind-ui-tag: #FCBA19;     /* gov-gold */
-                --pagefind-ui-border-radius: 6px;
+                --pagefind-ui-border: #D1D1D4;  
+                --pagefind-ui-tag: #FCBA19;     
+                --pagefind-ui-border-radius: 4px;
+                --pagefind-ui-font: 'BCSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             }
             
-            /* High-contrast search input */
             .pagefind-ui__search-input {
-                color: #0B0F19 !important;
+                color: #313132 !important;
                 background-color: #FFFFFF !important;
                 border: 1px solid var(--pagefind-ui-border) !important;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
             }
             
-            /* Subdued excerpt text */
             .pagefind-ui__result-excerpt {
-                color: #475569 !important;
+                color: #47474A !important;
             }
             
-            /* Brand-colored links */
             .pagefind-ui__result-title, .pagefind-ui__result-link {
                 color: #003366 !important;
                 text-decoration: none !important;
-                font-weight: 700;
+                font-weight: 600;
+                letter-spacing: -0.3px;
             }
             
-            /* Restored and formatted metadata tags */
-            .pagefind-ui__result-tags {
-                display: flex !important;
-                margin-top: 8px;
-                gap: 8px;
-            }
-            .pagefind-ui__result-tag {
-                color: #000000 !important;
-                font-weight: 600;
-                font-size: 11px;
-                padding: 4px 8px;
+            /* Styles the dynamic Jurisdiction Checkboxes */
+            .pagefind-ui__filter-name {
+                color: #003366 !important;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                font-size: 12px;
             }
         </style>
 
@@ -382,48 +378,18 @@
         <div id="search"></div>
 
         <script>
-            // 1. Build a full document lookup dictionary from your JSON files
-            const docDictionary = {};
-            const jsonSources = [
-                './data/escribe/ladysmith.json',
-                './data/escribe/sd68.json',
-                './data/wordpress/stzuminus.json'
-            ];
-
-            Promise.all(jsonSources.map(src => fetch(src).then(res => res.ok ? res.json() : [])))
-                .then(datasets => {
-                    datasets.flat().forEach(doc => {
-                        if (doc.doc_title) {
-                            docDictionary[doc.doc_title] = doc;
-                        }
-                    });
-                });
-
             window.addEventListener('DOMContentLoaded', (event) => {
                 new PagefindUI({ 
                     element: "#search", 
                     showSubResults: false, 
                     processResult: function (result) {
                         if (result.meta) {
-                            // 2. Match the result title against your JSON database
-                            const trueDoc = docDictionary[result.meta.title];
-                            
-                            if (trueDoc) {
-                                // Assign the live PDF URL
-                                result.url = trueDoc.source_url;
-                                
-                                // Inject structured metadata back into the UI
-                                if (trueDoc.jurisdiction) {
-                                    result.meta.Jurisdiction = trueDoc.jurisdiction;
-                                }
-                                if (trueDoc.tag1) {
-                                    result.meta.Category = trueDoc.tag1;
-                                }
+                            // Safely route the click to the explicit PDF URL
+                            if (result.meta.pdf_url) {
+                                result.url = result.meta.pdf_url;
                             }
-
-                            // 3. Purge the broken HTML metadata so it does not render
-                            delete result.meta.link;
-                            delete result.meta.jurisdiction; // Deletes the unformatted lowercase version
+                            // Clean up UI output
+                            delete result.meta.pdf_url;
                         }
                         return result;
                     }
