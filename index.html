@@ -329,140 +329,29 @@
     </div>
 </header>
 
-<div class="workspace">
-    <!-- Filters and Term Parsing inputs -->
-    <aside class="sidebar">
-        <div class="search-block">
-            <h3 class="sidebar-section-title">Search Terms</h3>
-            <input type="text" id="search-input" class="search-box" placeholder="Enter keywords... (e.g., water restrictions)">
-            <button onclick="executeSearch()" class="btn-submit">Search Files</button>
-        </div>
+<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center;">
+    
+    <div style="width: 100%; max-width: 900px;">
+        <!-- 1. Load the Pagefind Default UI Styles -->
+        <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
 
-        <div>
-            <h3 class="sidebar-section-title">Filter by jurisdictional source</h3>
-            <div class="checkbox-container">
-                <label><input type="checkbox" id="chk-ladysmith" checked> Town of Ladysmith</label>
-                <label><input type="checkbox" id="chk-sd68" checked> School District 68</label>
-                <label><input type="checkbox" id="chk-stzuminus" checked> Stz'uminus Nation</label>
-            </div>
-        </div>
-    </aside>
+        <!-- 2. Load the Pagefind Default UI Script -->
+        <script src="/pagefind/pagefind-ui.js"></script>
 
-    <!-- Results Stream Area -->
-    <section class="stream-viewport">
-        <div class="metrics-strip">
-            <div id="status-msg">Database initialized. Enter terms to search records.</div>
-            <div style="font-size: 10px; font-weight: 700; color: var(--gov-gold); letter-spacing: 0.5px;">Search Results</div>
-        </div>
+        <!-- 3. The Pagefind Container -->
+        <div id="search"></div>
 
-        <div class="scrollpane" id="results">
-            <div class="system-void-state">No active query execution in sequence.</div>
-        </div>
-    </section>
+        <!-- 4. Initialize the database -->
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                new PagefindUI({ 
+                    element: "#search", 
+                    showSubResults: true 
+                });
+            });
+        </script>
+    </div>
+
 </div>
-
-<script>
-    const dataSources = {
-        'chk-ladysmith': { name: 'Ladysmith', url: 'data/escribe/ladysmith.json' },
-        'chk-sd68': { name: 'SD68', url: 'data/escribe/sd68.json' },
-        'chk-stzuminus': { name: 'Stz\'uminus', url: 'data/wordpress/stzuminus.json' }
-    };
-
-    async function executeSearch() {
-        const query = document.getElementById('search-input').value.toLowerCase().trim();
-        const resultsContainer = document.getElementById('results');
-        const statusContainer = document.getElementById('status-msg');
-        
-// Wrapped in backticks to safely contain any special characters or single quotes
-        resultsContainer.innerHTML = `<div class="system-void-state">[i] Querying live database files...</div>`;
-        statusContainer.innerHTML = "V-V-V-VIRD, VIRD, VIRD. V-VIRD is the word...";
-        
-        let combinedEntries = [];
-        let sourcesLoaded = 0;
-
-        for (const [id, source] of Object.entries(dataSources)) {
-            if (document.getElementById(id).checked) {
-                try {
-                    const response = await fetch(source.url);
-                    if (response.ok) {
-                        const data = await response.json();
-                        data.forEach(item => item.sourceName = source.name);
-                        combinedEntries = combinedEntries.concat(data);
-                        sourcesLoaded++;
-                    }
-                } catch (err) {
-                    console.warn(`Registry offline: ${source.name}`);
-                }
-            }
-        }
-
-        if (combinedEntries.length === 0) {
-            resultsContainer.innerHTML = '<div class="system-void-state" style="color:#F43F5E; border-color:#F43F5E;">[-] Critical Error: Zero source records pulled.</div>';
-            statusContainer.innerHTML = "Query aborted.";
-            return;
-        }
-
-        let matches = combinedEntries;
-        if (query !== "") {
-            const searchTerms = query.split(/\s+/);
-            matches = combinedEntries.filter(entry => {
-                // Safeguard against missing/undefined fields during string composition
-                const searchString = [
-                    entry.doc_title || "",
-                    entry.source_url || "",
-                    entry.doc_summary || "",
-                    entry.doc_description || "",
-                    entry.tag1 || "", 
-                    entry.tag2 || "", 
-                    entry.tag3 || ""
-                ].join(" ").toLowerCase();
-                
-                return searchTerms.every(term => searchString.includes(term));
-            });
-        }
-
-        if (matches.length === 0) {
-            resultsContainer.innerHTML = '<div class="system-void-state">[-] Status: 0 records found matching constraints.</div>';
-            statusContainer.innerHTML = `Scanned ${combinedEntries.length} entries across ${sourcesLoaded} nodes.`;
-            return;
-        }
-
-        statusContainer.innerHTML = `Success: Found ${matches.length} matches out of ${combinedEntries.length} total entries.`;
-        resultsContainer.innerHTML = "";
-
-        matches.forEach(item => {
-            const docUrl = item.source_url || "#";
-            const docTitle = item.doc_title || "Untitled Document Entry";
-            const jurisdiction = item.jurisdiction || "Not Listed";
-            const date = item.doc_date || "Undated";
-            const summary = item.doc_summary || "";
-
-            let tagsHtml = "";
-            ['tag1', 'tag2', 'tag3', 'tag4'].forEach(tagKey => {
-                if (item[tagKey]) {
-                    tagsHtml += `<span class="data-badge">${item[tagKey]}</span> `;
-                }
-            });
-
-            const div = document.createElement('div');
-            div.className = 'raw-record-card';
-            div.innerHTML = `
-                <div class="record-top">
-                    <div class="record-identity">
-                        <span class="node-badge">${item.sourceName}</span>
-                        <a href="${docUrl}" target="_blank">${docTitle}</a>
-                    </div>
-                    <div class="date-stamp">[${date}]</div>
-                </div>
-                <div>
-                    <span class="jurisdiction-label">${jurisdiction}</span>
-                </div>
-                ${summary ? `<div class="doc-summary">${summary}</div>` : ''}
-                ${tagsHtml ? `<div class="tag-container">${tagsHtml}</div>` : ''}
-            `;
-            resultsContainer.appendChild(div);
-        });
-    }
-</script>
 </body>
 </html>
