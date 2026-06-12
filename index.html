@@ -332,23 +332,40 @@
 <div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center;">
     
     <div style="width: 100%; max-width: 900px;">
-        <!-- 1. Use relative paths (./) for GitHub Pages compatibility -->
+        <!-- Inject targeted CSS to fix text visibility -->
+        <style>
+            :root {
+                --pagefind-ui-text: #F8FAFC; 
+                --pagefind-ui-primary: #38BDF8; 
+            }
+            .pagefind-ui__search-input {
+                color: #000000 !important; /* Keeps the search bar text black */
+                background-color: #FFFFFF !important; /* Keeps the search bar white */
+            }
+        </style>
+
         <link href="./pagefind/pagefind-ui.css" rel="stylesheet">
         <script src="./pagefind/pagefind-ui.js"></script>
 
-        <!-- 3. The Pagefind Container -->
         <div id="search"></div>
 
-        <!-- 4. Initialize the database -->
         <script>
             window.addEventListener('DOMContentLoaded', (event) => {
                 new PagefindUI({ 
                     element: "#search", 
-                    showSubResults: true 
+                    showSubResults: true,
+                    // Intercept the result and replace the HTML link with the source PDF link
+                    processResult: function (result) {
+                        if (result.meta && result.meta.link) {
+                            result.url = result.meta.link;
+                        }
+                        return result;
+                    }
                 });
             });
         </script>
     </div>
+</div>
 </div>
 
 </div>
