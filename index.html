@@ -382,13 +382,12 @@
                 new PagefindUI({ 
                     element: "#search", 
                     showSubResults: false, 
+                    bundlePath: "/vird-document-index/pagefind/", /* Forces routing to the GitHub Pages subdirectory */
                     processResult: function (result) {
                         if (result.meta) {
-                            // Safely route the click to the explicit PDF URL
                             if (result.meta.pdf_url) {
                                 result.url = result.meta.pdf_url;
                             }
-                            // Clean up UI output
                             delete result.meta.pdf_url;
                         }
                         return result;
