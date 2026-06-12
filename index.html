@@ -332,11 +332,9 @@
 <div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center;">
     
     <div style="width: 100%; max-width: 900px;">
-        <!-- 1. Load the Pagefind Default UI Styles -->
-        <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
-
-        <!-- 2. Load the Pagefind Default UI Script -->
-        <script src="/pagefind/pagefind-ui.js"></script>
+        <!-- 1. Use relative paths (./) for GitHub Pages compatibility -->
+        <link href="./pagefind/pagefind-ui.css" rel="stylesheet">
+        <script src="./pagefind/pagefind-ui.js"></script>
 
         <!-- 3. The Pagefind Container -->
         <div id="search"></div>
@@ -351,6 +349,7 @@
             });
         </script>
     </div>
+</div>
 
 </div>
 </body>
