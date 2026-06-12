@@ -332,15 +332,30 @@
 <div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center;">
     
     <div style="width: 100%; max-width: 900px;">
-        <!-- Inject targeted CSS to fix text visibility -->
         <style>
+            /* Force Dark Mode UI Overrides */
             :root {
                 --pagefind-ui-text: #F8FAFC; 
                 --pagefind-ui-primary: #38BDF8; 
+                --pagefind-ui-background: #131A2C;
+                --pagefind-ui-border: #243152;
             }
             .pagefind-ui__search-input {
-                color: #000000 !important; /* Keeps the search bar text black */
-                background-color: #FFFFFF !important; /* Keeps the search bar white */
+                color: #F8FAFC !important;
+                background-color: #1B243C !important;
+                border: 1px solid var(--pagefind-ui-border) !important;
+            }
+            .pagefind-ui__result-excerpt {
+                color: #94A3B8 !important;
+            }
+            .pagefind-ui__result-title, .pagefind-ui__result-link {
+                color: #38BDF8 !important;
+                text-decoration: none !important;
+                font-weight: 600;
+            }
+            /* Erase the broken metadata tags */
+            .pagefind-ui__result-tags {
+                display: none !important; 
             }
         </style>
 
@@ -350,14 +365,34 @@
         <div id="search"></div>
 
         <script>
+            // 1. Build a URL lookup dictionary from your existing JSON files
+            const urlDictionary = {};
+            const jsonSources = [
+                './data/escribe/ladysmith.json',
+                './data/escribe/sd68.json',
+                './data/wordpress/stzuminus.json'
+            ];
+
+            Promise.all(jsonSources.map(src => fetch(src).then(res => res.ok ? res.json() : [])))
+                .then(datasets => {
+                    datasets.flat().forEach(doc => {
+                        if (doc.doc_title && doc.source_url) {
+                            urlDictionary[doc.doc_title] = doc.source_url;
+                        }
+                    });
+                });
+
             window.addEventListener('DOMContentLoaded', (event) => {
                 new PagefindUI({ 
                     element: "#search", 
-                    showSubResults: true,
-                    // Intercept the result and replace the HTML link with the source PDF link
+                    showSubResults: false, // Hides the messy duplicate .html cluster links
                     processResult: function (result) {
-                        if (result.meta && result.meta.link) {
-                            result.url = result.meta.link;
+                        // 2. Hijack the broken route and replace it with the true PDF URL
+                        if (result.meta && result.meta.title) {
+                            const trueUrl = urlDictionary[result.meta.title];
+                            if (trueUrl) {
+                                result.url = trueUrl;
+                            }
                         }
                         return result;
                     }
@@ -365,8 +400,6 @@
             });
         </script>
     </div>
-</div>
-</div>
 
 </div>
 </body>
