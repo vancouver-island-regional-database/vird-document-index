@@ -329,33 +329,50 @@
     </div>
 </header>
 
-<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center;">
+<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center; background-color: #F8FAFC;">
     
     <div style="width: 100%; max-width: 900px;">
         <style>
-            /* Force Dark Mode UI Overrides */
+            /* Light Theme & Brand Color Overrides */
             :root {
-                --pagefind-ui-text: #F8FAFC; 
-                --pagefind-ui-primary: #38BDF8; 
-                --pagefind-ui-background: #131A2C;
-                --pagefind-ui-border: #243152;
+                --pagefind-ui-primary: #003366; /* gov-blue */
+                --pagefind-ui-text: #0B0F19;    
+                --pagefind-ui-background: #FFFFFF;
+                --pagefind-ui-border: #CBD5E1;
+                --pagefind-ui-tag: #FCBA19;     /* gov-gold */
+                --pagefind-ui-border-radius: 6px;
             }
+            
+            /* High-contrast search input */
             .pagefind-ui__search-input {
-                color: #F8FAFC !important;
-                background-color: #1B243C !important;
+                color: #0B0F19 !important;
+                background-color: #FFFFFF !important;
                 border: 1px solid var(--pagefind-ui-border) !important;
             }
+            
+            /* Subdued excerpt text */
             .pagefind-ui__result-excerpt {
-                color: #94A3B8 !important;
+                color: #475569 !important;
             }
+            
+            /* Brand-colored links */
             .pagefind-ui__result-title, .pagefind-ui__result-link {
-                color: #38BDF8 !important;
+                color: #003366 !important;
                 text-decoration: none !important;
-                font-weight: 600;
+                font-weight: 700;
             }
-            /* Erase the broken metadata tags */
+            
+            /* Restored and formatted metadata tags */
             .pagefind-ui__result-tags {
-                display: none !important; 
+                display: flex !important;
+                margin-top: 8px;
+                gap: 8px;
+            }
+            .pagefind-ui__result-tag {
+                color: #000000 !important;
+                font-weight: 600;
+                font-size: 11px;
+                padding: 4px 8px;
             }
         </style>
 
@@ -365,8 +382,8 @@
         <div id="search"></div>
 
         <script>
-            // 1. Build a URL lookup dictionary from your existing JSON files
-            const urlDictionary = {};
+            // 1. Build a full document lookup dictionary from your JSON files
+            const docDictionary = {};
             const jsonSources = [
                 './data/escribe/ladysmith.json',
                 './data/escribe/sd68.json',
@@ -376,8 +393,8 @@
             Promise.all(jsonSources.map(src => fetch(src).then(res => res.ok ? res.json() : [])))
                 .then(datasets => {
                     datasets.flat().forEach(doc => {
-                        if (doc.doc_title && doc.source_url) {
-                            urlDictionary[doc.doc_title] = doc.source_url;
+                        if (doc.doc_title) {
+                            docDictionary[doc.doc_title] = doc;
                         }
                     });
                 });
@@ -385,14 +402,28 @@
             window.addEventListener('DOMContentLoaded', (event) => {
                 new PagefindUI({ 
                     element: "#search", 
-                    showSubResults: false, // Hides the messy duplicate .html cluster links
+                    showSubResults: false, 
                     processResult: function (result) {
-                        // 2. Hijack the broken route and replace it with the true PDF URL
-                        if (result.meta && result.meta.title) {
-                            const trueUrl = urlDictionary[result.meta.title];
-                            if (trueUrl) {
-                                result.url = trueUrl;
+                        if (result.meta) {
+                            // 2. Match the result title against your JSON database
+                            const trueDoc = docDictionary[result.meta.title];
+                            
+                            if (trueDoc) {
+                                // Assign the live PDF URL
+                                result.url = trueDoc.source_url;
+                                
+                                // Inject structured metadata back into the UI
+                                if (trueDoc.jurisdiction) {
+                                    result.meta.Jurisdiction = trueDoc.jurisdiction;
+                                }
+                                if (trueDoc.tag1) {
+                                    result.meta.Category = trueDoc.tag1;
+                                }
                             }
+
+                            // 3. Purge the broken HTML metadata so it does not render
+                            delete result.meta.link;
+                            delete result.meta.jurisdiction; // Deletes the unformatted lowercase version
                         }
                         return result;
                     }
@@ -400,6 +431,7 @@
             });
         </script>
     </div>
+</div>
 
 </div>
 </body>
