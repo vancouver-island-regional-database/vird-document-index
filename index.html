@@ -121,14 +121,13 @@
         <!-- Search Bar Mount Point -->
         <div id="search"></div>
     </main>
-
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
             new PagefindUI({ 
                 element: "#search", 
                 showSubResults: false, 
                 showEmptyFilters: true, 
-                bundlePath: "./pagefind/",
+                /* bundlePath has been completely removed */
                 processResult: function (result) {
                     if (result.meta) {
                         if (result.meta.pdf_url) { 
