@@ -30,7 +30,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Unified Header */
+        /* Unified Header Matches Homepage Exactly */
         header { 
             background-color: #003366; 
             color: #FFFFFF; 
@@ -42,16 +42,24 @@
             flex-wrap: wrap; 
             gap: 15px; 
         }
-        .header-left { display: flex; align-items: center; }
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+        }
         .header-logo { 
-            font-size: 20px; 
-            font-weight: 700; 
-            letter-spacing: 0.5px; 
             border-right: 1px solid rgba(255,255,255,0.3); 
             padding-right: 15px; 
             margin-right: 15px; 
+            display: flex; 
+            align-items: center; 
         }
-        .header-title { font-size: 18px; font-weight: 400; opacity: 0.95; }
+        .header-title { 
+            font-family: 'Myriad Pro', Myriad, Arial, sans-serif; 
+            font-size: 20px; 
+            font-weight: 550; 
+            letter-spacing: 0.3px; 
+            opacity: 0.95; 
+        }
         .nav-btn { 
             display: inline-flex; 
             align-items: center; 
