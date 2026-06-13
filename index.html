@@ -98,8 +98,8 @@
         }
     </style>
     
-    <link href="/vird-document-index/pagefind/pagefind-ui.css" rel="stylesheet">
-    <script src="/vird-document-index/pagefind/pagefind-ui.js"></script>
+    <link href="./pagefind/pagefind-ui.css" rel="stylesheet">
+    <script src="./pagefind/pagefind-ui.js"></script>
 </head>
 <body>
     <header>
@@ -128,7 +128,7 @@
                 element: "#search", 
                 showSubResults: false, 
                 showEmptyFilters: true, 
-                bundlePath: "/vird-document-index/pagefind/", 
+                bundlePath: "./pagefind/",
                 processResult: function (result) {
                     if (result.meta) {
                         if (result.meta.pdf_url) { 
