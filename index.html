@@ -3,401 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRD DOCUMENT INDEX</title>
+    <title>VIRD - Regional Document Mirror Search</title>
     <style>
+        /* Core VIRD Light Theme */
         :root {
-            --bg-main: #0B0F19;         /* Premium Midnight Deep Blue */
-            --bg-surface: #131A2C;      /* Card/Panel Blue-Grey */
-            --bg-input: #1B243C;        /* High-contrast Field Fill */
-            --gov-blue: #003366;
-            --gov-gold: #FCBA19;        /* Institutional Gold Accent */
-            --neon-blue: #38BDF8;       /* High-visibility active link */
-            --text-bright: #F8FAFC;     /* Primary Text */
-            --text-muted: #94A3B8;      /* Secondary Labels */
-            --border-glow: #243152;     /* Sharp Container Lines */
+            --pagefind-ui-primary: #003366; 
+            --pagefind-ui-text: #313132;    
+            --pagefind-ui-background: #FFFFFF;
+            --pagefind-ui-border: #D1D1D4;  
+            --pagefind-ui-tag: #FCBA19;     
+            --pagefind-ui-border-radius: 4px;
+            --pagefind-ui-font: 'BCSans', 'Helvetica Neue', Arial, sans-serif;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0; 
-            padding: 0;
-            background-color: var(--bg-main); 
-            color: var(--text-bright); 
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            padding: 0; 
+            font-family: var(--pagefind-ui-font); 
+            color: #313132; 
+            background-color: #FAFAFA; 
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Agency-Styled Minimalist Header */
+        /* Unified Header */
         header { 
-            background-color: #060911; 
-            padding: 16px 32px; 
+            background-color: #003366; 
+            color: #FFFFFF; 
+            padding: 15px 30px; 
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            border-bottom: 1px solid var(--border-glow);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            z-index: 10;
-            flex-shrink: 0;
+            border-bottom: 4px solid #FCBA19; 
+            flex-wrap: wrap; 
+            gap: 15px; 
         }
-        
-        .brand-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+        .header-left { display: flex; align-items: center; }
+        .header-logo { 
+            font-size: 20px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            border-right: 1px solid rgba(255,255,255,0.3); 
+            padding-right: 15px; 
+            margin-right: 15px; 
         }
-
-        .brand-title {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: var(--text-bright);
-        }
-
-        .engine-status-badge {
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--neon-blue);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.75px;
-        }
-
-        .nav-hub-link {
-            color: var(--text-muted); 
+        .header-title { font-size: 18px; font-weight: 400; opacity: 0.95; }
+        .nav-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            color: #FFFFFF; 
             text-decoration: none; 
-            font-size: 12px; 
-            font-weight: 600; 
-            padding: 6px 14px; 
-            border-radius: 4px;
-            border: 1px solid var(--border-glow); 
-            transition: all 0.15s ease;
-        }
-        .nav-hub-link:hover { 
-            color: var(--text-bright);
-            background: var(--bg-surface);
-            border-color: var(--neon-blue);
-        }
-
-        /* Workspace Grid Split */
-        .workspace {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Refined Control Sidebar */
-        .sidebar {
-            width: 320px;
-            background: #080D18;
-            border-right: 1px solid var(--border-glow);
-            padding: 32px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-
-        .sidebar-section-title {
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0 0 14px 0;
-        }
-
-        .search-block {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .search-box {
-            width: 100%;
-            box-sizing: border-box;
-            background: var(--bg-input);
-            border: 1px solid var(--border-glow);
-            padding: 14px;
-            color: var(--text-bright);
-            font-size: 14px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-        .search-box:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
-            outline: none;
-        }
-
-        .btn-submit {
-            background: var(--gov-blue);
-            color: #FFFFFF;
-            border: none;
-            padding: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #001A33;
-            transition: background 0.15s;
-        }
-        .btn-submit:hover { 
-            background: #004488; 
-        }
-
-        /* Checkbox Layout Group */
-        .checkbox-container {
-            background: var(--bg-surface);
-            border-radius: 6px;
-            padding: 16px;
-            border: 1px solid var(--border-glow);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .checkbox-container label {
-            font-size: 13.5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            user-select: none;
-            color: var(--text-bright);
-        }
-
-        .checkbox-container input {
-            margin-right: 12px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--neon-blue);
-        }
-
-        /* Main Data Display Stream */
-        .stream-viewport {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Status Metrics Strip */
-        .metrics-strip {
-            background: #090E1A;
-            border-bottom: 1px solid var(--border-glow);
-            padding: 14px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12.5px;
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-
-        /* Infinite Scroll Pane for Global Document Ingestion */
-        .scrollpane {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* High-Density Modern Raw Record Row */
-        .raw-record-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-glow);
-            border-radius: 6px;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            transition: all 0.15s ease;
-        }
-        .raw-record-card:hover {
-            border-color: rgba(56, 189, 248, 0.4);
-            background: #17223B;
-        }
-
-        .record-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .record-identity {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .node-badge {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-bright);
-            border: 1px solid var(--border-glow);
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .raw-record-card a {
-            color: var(--neon-blue);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14.5px;
-            line-height: 1.4;
-        }
-        .raw-record-card a:hover {
-            color: #7DD3FC;
-            text-decoration: underline;
-        }
-
-        .date-stamp {
-            color: var(--text-muted);
-            font-size: 12px;
-            font-family: monospace;
-            white-space: nowrap;
-        }
-
-        .jurisdiction-label {
-            color: var(--gov-gold);
-            font-size: 11.5px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.25px;
-        }
-
-        .doc-summary { 
-            color: var(--text-muted); 
-            font-size: 13px; 
-            margin: 4px 0; 
-            border-left: 2px solid var(--border-glow); 
-            padding-left: 10px; 
-        }
-
-        .tag-container { 
-            display: flex; 
-            gap: 6px; 
-            margin-top: 4px; 
-            flex-wrap: wrap;
-        }
-
-        .data-badge { 
-            background: rgba(56, 189, 248, 0.05); 
-            color: var(--neon-blue); 
-            padding: 1px 6px; 
             font-size: 11px; 
+            font-weight: bold; 
+            background-color: rgba(255,255,255,0.1); 
+            padding: 5px 12px; 
             border-radius: 3px; 
-            border: 1px solid rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(255,255,255,0.2); 
+            letter-spacing: 0.5px; 
         }
 
-        /* Empty state baseline */
-        .system-void-state {
-            padding: 48px;
-            text-align: center;
-            color: var(--text-muted);
-            background: #080D18;
-            border: 1px dashed var(--border-glow);
-            border-radius: 6px;
-            font-size: 13.5px;
+        main { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+
+        /* Summary Box */
+        .portal-intro { 
+            background-color: #FFFFFF; 
+            border: 1px solid #D1D1D4; 
+            border-top: 4px solid #003366; 
+            padding: 30px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        }
+        .portal-intro h1 { color: #003366; margin-top: 0; font-size: 26px; font-weight: 600; }
+        .portal-intro p { font-size: 15px; line-height: 1.6; color: #47474A; margin-bottom: 0; }
+        
+        /* Pagefind Component Overrides */
+        .pagefind-ui__search-input { 
+            color: #313132 !important; 
+            background-color: #FFFFFF !important; 
+            border: 1px solid var(--pagefind-ui-border) !important; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important; 
+        }
+        .pagefind-ui__result-excerpt { color: #47474A !important; }
+        .pagefind-ui__result-title, .pagefind-ui__result-link { 
+            color: #003366 !important; 
+            text-decoration: none !important; 
+            font-weight: 600; 
+            letter-spacing: -0.3px; 
+        }
+        .pagefind-ui__filter-name { 
+            color: #003366 !important; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.6px; 
+            font-size: 12px; 
         }
     </style>
+    
+    <link href="/vird-document-index/pagefind/pagefind-ui.css" rel="stylesheet">
+    <script src="/vird-document-index/pagefind/pagefind-ui.js"></script>
 </head>
 <body>
-
-<header>
-    <div class="brand-wrapper">
-        <div class="brand-title">VIRD DOCUMENT INDEX</div>
-        <div class="engine-status-badge">Interjurisdictional Directory of online public Documents</div>
-    </div>
-    <div>
-        <a href="/home/" class="nav-hub-link">HOME</a>
-    </div>
-</header>
-
-<div class="workspace" style="padding: 32px; width: 100%; overflow-y: auto; display: flex; justify-content: center; background-color: #FAFAFA;">
+    <header>
+        <div class="header-left">
+            <div class="header-logo">VIRD</div>
+            <div class="header-title">Master Document Index Engine</div>
+        </div>
+        <div>
+            <a href="/home/" class="nav-btn">HOME PORTAL</a>
+        </div>
+    </header>
     
-    <div style="width: 100%; max-width: 900px;">
-        <style>
-            /* Native Brand Injection from VIRD Master Styles */
-            :root {
-                --pagefind-ui-primary: #003366; 
-                --pagefind-ui-text: #313132;    
-                --pagefind-ui-background: #FFFFFF;
-                --pagefind-ui-border: #D1D1D4;  
-                --pagefind-ui-tag: #FCBA19;     
-                --pagefind-ui-border-radius: 4px;
-                --pagefind-ui-font: 'BCSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            }
-            
-            .pagefind-ui__search-input {
-                color: #313132 !important;
-                background-color: #FFFFFF !important;
-                border: 1px solid var(--pagefind-ui-border) !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
-            }
-            
-            .pagefind-ui__result-excerpt {
-                color: #47474A !important;
-            }
-            
-            .pagefind-ui__result-title, .pagefind-ui__result-link {
-                color: #003366 !important;
-                text-decoration: none !important;
-                font-weight: 600;
-                letter-spacing: -0.3px;
-            }
-            
-            /* Styles the dynamic Jurisdiction Checkboxes */
-            .pagefind-ui__filter-name {
-                color: #003366 !important;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.6px;
-                font-size: 12px;
-            }
-        </style>
+    <main>
+        <section class="portal-intro">
+            <h1>Database Search Engine</h1>
+            <p>A high-density directory parsing automated and raw cross-jurisdictional file systems. Use the query framework below to search active data mappings, unstructured logs, and public file systems matching regional parameters.</p>
+        </section>
 
-        <link href="./pagefind/pagefind-ui.css" rel="stylesheet">
-        <script src="./pagefind/pagefind-ui.js"></script>
-
+        <!-- Search Bar Mount Point -->
         <div id="search"></div>
+    </main>
 
-        <script>
-            window.addEventListener('DOMContentLoaded', (event) => {
-                new PagefindUI({ 
-                    element: "#search", 
-                    showSubResults: false, 
-                    bundlePath: "/vird-document-index/pagefind/", /* Forces routing to the GitHub Pages subdirectory */
-                    processResult: function (result) {
-                        if (result.meta) {
-                            if (result.meta.pdf_url) {
-                                result.url = result.meta.pdf_url;
-                            }
-                            delete result.meta.pdf_url;
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            new PagefindUI({ 
+                element: "#search", 
+                showSubResults: false, 
+                showEmptyFilters: true, 
+                bundlePath: "/vird-document-index/pagefind/", 
+                processResult: function (result) {
+                    if (result.meta) {
+                        if (result.meta.pdf_url) { 
+                            result.url = result.meta.pdf_url; 
                         }
-                        return result;
+                        delete result.meta.pdf_url;
                     }
-                });
+                    return result;
+                }
             });
-        </script>
-    </div>
-</div>
-
-</div>
+        });
+    </script>
 </body>
 </html>
