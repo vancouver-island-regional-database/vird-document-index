@@ -1,6 +1,147 @@
-<script>
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRD - Regional Document Mirror Search</title>
+    <style>
+        /* Core VIRD Light Theme */
+        :root {
+            --pagefind-ui-primary: #003366; 
+            --pagefind-ui-text: #313132;    
+            --pagefind-ui-background: #FFFFFF;
+            --pagefind-ui-border: #D1D1D4;  
+            --pagefind-ui-tag: #FCBA19;     
+            --pagefind-ui-border-radius: 4px;
+            --pagefind-ui-font: 'BCSans', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: var(--pagefind-ui-font); 
+            color: #313132; 
+            background-color: #FAFAFA; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Unified Header */
+        header { 
+            background-color: #003366; 
+            color: #FFFFFF; 
+            padding: 15px 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            border-bottom: 4px solid #FCBA19; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .header-left { display: flex; align-items: center; }
+        .header-logo { 
+            font-size: 20px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            border-right: 1px solid rgba(255,255,255,0.3); 
+            padding-right: 15px; 
+            margin-right: 15px; 
+        }
+        .header-title { font-size: 18px; font-weight: 400; opacity: 0.95; }
+        .nav-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            color: #FFFFFF; 
+            text-decoration: none; 
+            font-size: 11px; 
+            font-weight: bold; 
+            background-color: rgba(255,255,255,0.1); 
+            padding: 5px 12px; 
+            border-radius: 3px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            letter-spacing: 0.5px; 
+        }
+
+        main { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+
+        /* Summary Box */
+        .portal-intro { 
+            background-color: #FFFFFF; 
+            border: 1px solid #D1D1D4; 
+            border-top: 4px solid #003366; 
+            padding: 30px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        }
+        .portal-intro h1 { color: #003366; margin-top: 0; font-size: 26px; font-weight: 600; }
+        .portal-intro p { font-size: 15px; line-height: 1.6; color: #47474A; margin-bottom: 0; }
+        
+        /* Pagefind Component Overrides */
+        .pagefind-ui__search-input { 
+            color: #313132 !important; 
+            background-color: #FFFFFF !important; 
+            border: 1px solid var(--pagefind-ui-border) !important; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important; 
+        }
+        .pagefind-ui__result-excerpt { color: #47474A !important; }
+        .pagefind-ui__result-title, .pagefind-ui__result-link { 
+            color: #003366 !important; 
+            text-decoration: none !important; 
+            font-weight: 600; 
+            letter-spacing: -0.3px; 
+        }
+        .pagefind-ui__filter-name { 
+            color: #003366 !important; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.6px; 
+            font-size: 12px; 
+        }
+
+        /* CSV Button Wrapper Styling */
+        .csv-btn-wrapper {
+            display: flex; 
+            justify-content: flex-end; 
+            margin-bottom: -45px; 
+            position: relative; 
+            z-index: 10; 
+            padding-right: 10px;
+        }
+    </style>
+    
+    <link href="/vird-document-index/pagefind/pagefind-ui.css" rel="stylesheet">
+    <script src="/vird-document-index/pagefind/pagefind-ui.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="header-logo">VIRD</div>
+            <div class="header-title">VIRD Document Index</div>
+        </div>
+        <div>
+            <a href="/home/" class="nav-btn">HOME</a>
+        </div>
+    </header>
+    
+    <main>
+        <section class="portal-intro">
+            <h1>Regional Document Search Engine</h1>
+            <p>An interjurisdictional directory of available online public documents, directly linking to their official source url. Use the search bar to enter your search terms and the documents with matching content will appear. Filter by jurisdiction on the left to narrow down your results, and click on the document title to open the file at its original url.</p> 
+            <p><i>This database is currently capable of searching the text contents of 15,000 pdf files across the official websites of the Town of Ladysmith, the Stz'uminus First Nation, and School District 68 (Nanaimo-Ladysmith). Please check back later for additional jurisdictions and content as this database continues to grow.</i></p>
+            <p><b>Please note that all files are hosted externally and clicking a link will open the document on its original website in a new tab. Some websites are configured to automatically download PDF files when opened. Since you will no longer be on the Vancouver Island Regional Database website, we have no control over whether the file will be opened in your browser or automatically downloaded to your device.</b></p>
+        </section>
+
+        <div class="csv-btn-wrapper">
+            <button id="downloadCsvBtn" onclick="exportSearchToCSV()" style="display: none; background-color: #003366; color: #FFFFFF; border: none; padding: 10px 16px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                DOWNLOAD ALL MATCHES (CSV) ↓
+            </button>
+        </div>
+
+        <div id="search"></div>
+    </main>
+
+    <script>
         window.addEventListener('DOMContentLoaded', (event) => {
-            // 1. Initialize your existing PagefindUI exactly as before
+            // Initialize your existing PagefindUI exactly as before
             new PagefindUI({ 
                 element: "#search", 
                 showSubResults: false, 
@@ -21,7 +162,7 @@
                 }
             });
 
-            // 2. Attach a listener to show/hide the CSV button when the user types
+            // Attach a listener to show/hide the CSV button when the user types
             setTimeout(() => {
                 const searchInput = document.querySelector('.pagefind-ui__search-input');
                 const downloadBtn = document.getElementById('downloadCsvBtn');
@@ -35,11 +176,10 @@
                         }
                     });
                 }
-            }, 500); // 500ms delay ensures Pagefind has finished building the search box first
+            }, 500); 
         });
 
-        // 3. Force PDF Results to Open in a New Tab
-        // This intercepts any click on a search result and adds the target="_blank" attribute
+        // Force PDF Results to Open in a New Tab
         document.addEventListener('click', function(e) {
             const resultLink = e.target.closest('.pagefind-ui__result-link');
             if (resultLink) {
@@ -48,7 +188,7 @@
             }
         });
 
-        // 4. The Headless Parallel Search Function for CSV Export
+        // The Headless Parallel Search Function for CSV Export
         async function exportSearchToCSV() {
             const searchInput = document.querySelector('.pagefind-ui__search-input');
             const query = searchInput ? searchInput.value.trim() : "";
@@ -58,50 +198,53 @@
             const downloadBtn = document.getElementById('downloadCsvBtn');
             const originalText = downloadBtn.innerText;
             
-            // Visual feedback that the export is working
             downloadBtn.innerText = "COMPILING CSV...";
             downloadBtn.style.backgroundColor = "#FCBA19";
             downloadBtn.style.color = "#003366";
 
-            // Run a parallel headless search to get all data points
-            const pagefind = await import("/pagefind/pagefind.js");
-            const search = await pagefind.search(query);
-            
-            if (!search || search.results.length === 0) {
-                alert("No results found to export.");
-                downloadBtn.innerText = originalText;
-                downloadBtn.style.backgroundColor = "#003366";
-                downloadBtn.style.color = "#FFFFFF";
-                return;
+            try {
+                // HARDCODED ABSOLUTE PATH FOR HEADLESS IMPORT
+                const pagefind = await import("/vird-document-index/pagefind/pagefind.js");
+                const search = await pagefind.search(query);
+                
+                if (!search || search.results.length === 0) {
+                    alert("No results found to export.");
+                    downloadBtn.innerText = originalText;
+                    downloadBtn.style.backgroundColor = "#003366";
+                    downloadBtn.style.color = "#FFFFFF";
+                    return;
+                }
+
+                const allData = await Promise.all(search.results.map(r => r.data()));
+
+                const headers = ["Document Title", "Source URL", "Jurisdiction", "Document Date"];
+                const rows = allData.map(data => {
+                    const title = (data.meta.title || 'Untitled').replace(/"/g, '""');
+                    const url = data.meta.pdf_url || data.url || '';
+                    const jurisdiction = (data.filters && data.filters.Jurisdiction) ? data.filters.Jurisdiction.join(' | ').replace(/"/g, '""') : 'Unknown';
+                    const date = data.meta.date || 'N/A';
+                    return `"${title}","${url}","${jurisdiction}","${date}"`;
+                });
+
+                const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+                const encodedUri = encodeURI(csvContent);
+                
+                const downloadAnchor = document.createElement("a");
+                downloadAnchor.setAttribute("href", encodedUri);
+                downloadAnchor.setAttribute("download", `VIRD_Export_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                document.body.removeChild(downloadAnchor);
+
+            } catch (err) {
+                console.error("Export Failed:", err);
+                alert("Failed to compile CSV. Please ensure the search index has finished building.");
             }
 
-            // Await the extraction of all result metadata payloads
-            const allData = await Promise.all(search.results.map(r => r.data()));
-
-            // Build standard CSV format
-            const headers = ["Document Title", "Source URL", "Jurisdiction", "Document Date"];
-            const rows = allData.map(data => {
-                const title = (data.meta.title || 'Untitled').replace(/"/g, '""');
-                const url = data.meta.pdf_url || data.url || '';
-                const jurisdiction = (data.filters && data.filters.Jurisdiction) ? data.filters.Jurisdiction.join(' | ').replace(/"/g, '""') : 'Unknown';
-                const date = data.meta.date || 'N/A';
-                return `"${title}","${url}","${jurisdiction}","${date}"`;
-            });
-
-            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-            const encodedUri = encodeURI(csvContent);
-            
-            // Trigger local browser download
-            const downloadAnchor = document.createElement("a");
-            downloadAnchor.setAttribute("href", encodedUri);
-            downloadAnchor.setAttribute("download", `VIRD_Export_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
-
-            // Reset button aesthetics
             downloadBtn.innerText = originalText;
             downloadBtn.style.backgroundColor = "#003366";
             downloadBtn.style.color = "#FFFFFF";
         }
     </script>
+</body>
+</html>
