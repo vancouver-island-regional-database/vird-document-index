@@ -105,17 +105,18 @@
     <header>
         <div class="header-left">
             <div class="header-logo">VIRD</div>
-            <div class="header-title">Master Document Index Engine</div>
+            <div class="header-title">VIRD Document Index</div>
         </div>
         <div>
-            <a href="/home/" class="nav-btn">HOME PORTAL</a>
+            <a href="/home/" class="nav-btn">HOME</a>
         </div>
     </header>
     
     <main>
         <section class="portal-intro">
-            <h1>Database Search Engine</h1>
-            <p>A high-density directory parsing automated and raw cross-jurisdictional file systems. Use the query framework below to search active data mappings, unstructured logs, and public file systems matching regional parameters.</p>
+            <h1>Regional Document Search Engine</h1>
+            <p>An interjurisdictional directory of available online public documents, directly linking to their official source url. This database is currently capable of searching the text contents of 15,000 pdf files across the official websites of the Town of Ladysmith, the Stz'uminus First Nation, and School District 68 (Nanaimo-Ladysmith). Please check back later for additional jurisdictions and content as this database continues to grow. 
+                <br> Use the search bar to enter your search terms, and the documents with matching content will appear. Filter by jurisdiction on the left to narrow down your results, and click on the document title to be taken directly to the file's original url. <i>Please note that all files are hosted externally and you will leave the VIRD website when you click on a link.</i> </p>
         </section>
 
         <!-- Search Bar Mount Point -->
@@ -127,13 +128,25 @@
                 element: "#search", 
                 showSubResults: false, 
                 showEmptyFilters: true, 
-                /* bundlePath has been completely removed */
                 processResult: function (result) {
                     if (result.meta) {
+                        // 1. Route to actual PDF
                         if (result.meta.pdf_url) { 
                             result.url = result.meta.pdf_url; 
+                            delete result.meta.pdf_url;
                         }
-                        delete result.meta.pdf_url;
+                        
+                        // 2. Custom Gold Jurisdiction Pill
+                        if (result.meta.jurisdiction) {
+                            // Build the isolated UI element
+                            let customPill = `<span style="background-color: #FCBA19; color: #003366; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 8px; display: inline-block; vertical-align: middle;">${result.meta.jurisdiction}</span>`;
+                            
+                            // Inject it before the text excerpt
+                            result.excerpt = customPill + result.excerpt;
+                            
+                            // Delete the default grey pill
+                            delete result.meta.jurisdiction;
+                        }
                     }
                     return result;
                 }
