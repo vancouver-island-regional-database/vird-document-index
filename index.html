@@ -78,8 +78,8 @@
             background-color: #FFFFFF; 
             border: 1px solid #D1D1D4; 
             border-top: 4px solid #003366; 
-            padding: 30px; 
-            margin-bottom: 40px; 
+            padding: 30px 30px 25px 30px; 
+            margin-bottom: 5px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
         }
         .portal-intro h1 { color: #003366; margin-top: 0; font-size: 26px; font-weight: 600; }
@@ -145,25 +145,26 @@
 
     <main>
         <section class="portal-intro">
-        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px;">
-            <!-- Standalone icon asset with subtle upward nudge -->
-            <img src="../home/assets/vird_logo_blue.png" alt="VIRD Mark Blue" style="height: 60px; width: auto; display: block; margin-top: -6px;">
-             <!-- Section title -->
-            <h1>Regional Document Search Engine
-            </h1>
-            <!-- Clean vertical layout divider -->
-            <div style="border-left: 2px solid #D1D1D4; height: 40px; display: inline-block;"></div>
-            <h1>All Jurisdictions
-            </h1>
-         </div>
-            <p> An interjurisdictional directory of available online public documents, directly linking to their official source url. Use the search bar to enter your search terms and the documents with matching content will appear. Filter by jurisdiction on the left to narrow down your results, and click on the document title to open the file at its original url.
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 28px;">
+             <!-- Standalone icon asset -->
+                <img src="../home/assets/vird_logo_blue.png" alt="VIRD Mark Blue" style="height: 60px; width: auto; display: block;">
+    
+             <!-- Unified Section Title containing both parts -->
+             <h1 style="margin: 0; display: flex; align-items: center; gap: 20px; font-size: 26px; font-weight: 600; color: #003366;">
+                    <span>Online Search Engine</span>
+                  <!-- Clean vertical layout divider -->
+                 <span style="border-left: 2px solid #D1D1D4; height: 32px; display: inline-block;"></span>
+                 <span>Regional Public Document Index</span>
+                </h1>
+            </div>
+            <p>This database provides access to authoritative regional open data by linking directly to pdf files across multiple platforms and jurisdictions. It is currently capable of searching the text contents of 15,000 documents across the official websites of the Town of Ladysmith, the Stz'uminus First Nation, and School District 68 (Nanaimo-Ladysmith). Please check back later for additional jurisdictions and content as this database continues to grow.
             </p>
-            <p>This database is currently capable of searching the text contents of 15,000 pdf files across the official websites of the Town of Ladysmith, the Stz'uminus First Nation, and School District 68 (Nanaimo-Ladysmith). Please check back later for additional jurisdictions and content as this database continues to grow.
+            <p> To lookup information, type your search terms below and documents with matching content will appear. Filter by jurisdiction on the left to narrow down your results, and click on the document title to view the file on its official source website. You can also export all of the search results to a CSV file by clicking the "Download All Matches (CSV)" button that appears after you start typing in the search bar.
             </p>
-            <p style="font-size: 12px; line-height: 1.6; color: #003366; margin-bottom: 0;">Please note that all files are hosted externally and <b>clicking a link will open the document on its original website in a new tab.</b> 
-                <br>Some websites are configured to automatically download PDF files when opened. Since you will no longer be on the Vancouver Island Regional Database website, <b>we have no control over whether the file will be opened in your browser or automatically downloaded</b> to your device.</p>
-            </p>
-            <p style="font-size: 12px; opacity: 0.5; line-height: 3; color: #606062; margin-bottom: 0;">Last modified: June 2026</p>
+            <!-- The Divider Line -->
+            <hr style="border: 0; height: 1px; background: #D1D1D4; margin-top: 30px;margin-bottom: 30px 0;">
+            <p style="font-size: 12px; line-height: 1.6; color: #003366; margin-top: 20px; margin-bottom: 0;"><i>Please note that none of these documents are hosted on the Vancouver Island Regional Database website. Clicking a link will open the document on its original website in a new tab. We have no control over whether external websites are configured to open the pdf in your browser or automatically download to your device.</i></p>
+            <p style="font-size: 12px; opacity: 0.5; line-height: 1.6; color: #606062; margin-bottom: 0;">Last modified: June 2026</p>
         </section>
 
         <div class="csv-btn-wrapper">
