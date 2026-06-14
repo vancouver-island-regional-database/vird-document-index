@@ -90,11 +90,13 @@
         
         /* Pagefind Component Overrides */
         .pagefind-ui__search-input { 
+            margin-top: 25px; /* Pushes the input down away from the header box */
             color: #313132 !important; 
-            background-color: #FFFFFF !important; 
-            border: 1px solid var(--pagefind-ui-border) !important; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important; 
-        }
+            background-color: #F5F5F7 !important; /* Soft gray background for high visibility */
+            border: 1px solid #C4C4C7 !important; /* Defined, visible border line */
+            border-radius: var(--pagefind-ui-border-radius) !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important; /* Subtle inner shadow for field depth */
+        }     
         .pagefind-ui__result-excerpt { color: #47474A !important; }
         .pagefind-ui__result-title, .pagefind-ui__result-link { 
             color: #003366 !important; 
@@ -127,13 +129,13 @@
 <body>
     
 <header>
-    <div class="header-left" style="display: flex; align-items: center;">
-        <div class="header-logo" style="border-right: 1px solid rgba(255,255,255,0.3); padding-right: 15px; margin-right: 15px; display: flex; align-items: center;">
-            <a href="/home/" style="display: flex; align-items: center;">
-                <img src="../home/assets/vird_logo_white.png" alt="VIRD Mark White" style="height: 48px; width: auto; display: block;">
+    <div class="header-left">
+        <div class="header-logo">
+            <a href="/home" style="display: flex; align-items: center;">
+                <img src="../home/assets/vird_logo_white.png" alt="VIRD Mark White" style="height: 58px; width: auto; display: block;">
             </a>
         </div>
-        <div class="header-title">VIRD Document Index</div>
+        <div class="header-title">Vancouver Island Regional Database</div>
     </div>
     <div>
         <a href="/home/" class="nav-btn">HOME</a>
