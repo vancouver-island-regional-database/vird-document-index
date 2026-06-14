@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIRD - Regional Document Mirror Search</title>
 
-    <!-- Favicon Shortcut Link -->
     <link rel="icon" type="image/png" href="../home/assets/fav_w.png">
-    
-    <meta name="description" content="An interjurisdictional directory and search engine for online public documents across the Mid-Island Region.">
-    <meta name="robots" content="index, follow" />
-
     <style>
         /* Core VIRD Light Theme */
         :root {
@@ -32,6 +27,50 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Unified Header Matches Homepage Exactly */
+        header { 
+            background-color: #003366; 
+            color: #FFFFFF; 
+            padding: 15px 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            border-bottom: 4px solid #FCBA19; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-logo { 
+            border-right: 1px solid rgba(255,255,255,0.3); 
+            padding-right: 15px; 
+            margin-right: 15px; 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-title { 
+            font-family: 'Myriad Pro', Myriad, Arial, sans-serif; 
+            font-size: 20px; 
+            font-weight: 550; 
+            letter-spacing: 0.3px; 
+            opacity: 0.95; 
+        }
+        .nav-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            color: #FFFFFF; 
+            text-decoration: none; 
+            font-size: 11px; 
+            font-weight: bold; 
+            background-color: rgba(255,255,255,0.1); 
+            padding: 5px 12px; 
+            border-radius: 3px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            letter-spacing: 0.5px; 
+        }
+
         main { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
 
         /* Summary Box */
@@ -48,14 +87,16 @@
         
         /* Pagefind Component Overrides */
         #search {
-            margin-top: 60px; /* Separates the search container from the CSV button */
+            margin-top: 60px;
         }
+
         .pagefind-ui__search-input { 
+            margin-top: 25px; /* Pushes the input down away from the header box */
             color: #313132 !important; 
-            background-color: #F5F5F7 !important; 
-            border: 1px solid #C4C4C7 !important; 
+            background-color: #F5F5F7 !important; /* Soft gray background for high visibility */
+            border: 1px solid #C4C4C7 !important; /* Defined, visible border line */
             border-radius: var(--pagefind-ui-border-radius) !important;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important; 
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important; /* Subtle inner shadow for field depth */
         }     
         .pagefind-ui__result-excerpt { color: #47474A !important; }
         .pagefind-ui__result-title, .pagefind-ui__result-link { 
@@ -88,20 +129,17 @@
 </head>
 <body>
     
-<!-- Inline Header Restored to Prevent CSS Conflicts -->
-<header style="background-color: #003366; color: #FFFFFF; padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #FCBA19; flex-wrap: wrap; gap: 15px;">
-    <div style="display: flex; align-items: center;">
-        <div style="border-right: 1px solid rgba(255,255,255,0.3); padding-right: 15px; margin-right: 15px; display: flex; align-items: center;">
+<header>
+    <div class="header-left">
+        <div class="header-logo">
             <a href="/home" style="display: flex; align-items: center;">
                 <img src="../home/assets/vird_logo_white.png" alt="VIRD Mark White" style="height: 58px; width: auto; display: block;">
             </a>
         </div>
-        <div style="font-family: 'Myriad Pro', Myriad, Arial, sans-serif; font-size: 20px; font-weight: 550; letter-spacing: 0.3px; opacity: 0.95;">
-            Vancouver Island Regional Database
-        </div>
+        <div class="header-title">Vancouver Island Regional Database</div>
     </div>
     <div>
-        <a href="/home/" style="display: inline-flex; align-items: center; color: #FFFFFF; text-decoration: none; font-size: 11px; font-weight: bold; background-color: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); letter-spacing: 0.5px; transition: background 0.15s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)';" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)';">HOME</a>
+        <a href="/home/" class="nav-btn">HOME</a>
     </div>
 </header>
 
@@ -111,6 +149,7 @@
             <p>An interjurisdictional directory of available online public documents, directly linking to their official source url. Use the search bar to enter your search terms and the documents with matching content will appear. Filter by jurisdiction on the left to narrow down your results, and click on the document title to open the file at its original url.</p> 
             <p><i>This database is currently capable of searching the text contents of 15,000 pdf files across the official websites of the Town of Ladysmith, the Stz'uminus First Nation, and School District 68 (Nanaimo-Ladysmith). Please check back later for additional jurisdictions and content as this database continues to grow.</i></p>
             <p><b>Please note that all files are hosted externally and clicking a link will open the document on its original website in a new tab. Some websites are configured to automatically download PDF files when opened. Since you will no longer be on the Vancouver Island Regional Database website, we have no control over whether the file will be opened in your browser or automatically downloaded to your device.</b></p>
+            </p>
             <p style="font-size: 12px; opacity: 0.5; line-height: 3; color: #606062; margin-bottom: 0;">Last modified: June 2026</p>
         </section>
 
@@ -125,13 +164,11 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
+            // Initialize your existing PagefindUI exactly as before
             new PagefindUI({ 
                 element: "#search", 
-                showSubResults: true,
-                showEmptyFilters: true, // Restored to true so checkboxes always show
-                showImages: false,
-                excerptLength: 45,
-                // sort: { date: "desc" }, // Commented out until index possesses date attributes
+                showSubResults: false, 
+                showEmptyFilters: true, 
                 processResult: function (result) {
                     if (result.meta) {
                         if (result.meta.pdf_url) { 
